@@ -25,10 +25,22 @@ func StoreFVM() error {
 	return util.FWrite(conf.WDir()+"/fvm.json", util.S2Json(FVM))
 }
 
-func FVM_C(srv, tp string) error {
+func FVM_C(tp string) error {
 	n_fvm_l := util.Map{}
-	tfvm, err := util.NewMap(tp + "/fvm.json")
+	tfvm_l, err := util.NewMap(tp + "/fvm.json")
 	if err != nil {
+		log.E("read local fvm.json error:%v", err.Error())
+		return err
+	}
+	srv := tfvm_l.StrVal("srv")
+	if len(srv) < 1 {
+		err = util.Err("srv node not found")
+		log.E("read local fvm.json error:%v", err.Error())
+		return err
+	}
+	tfvm := tfvm_l.MapVal("fvm")
+	if tfvm == nil {
+		err = util.Err("fvm node not found")
 		log.E("read local fvm.json error:%v", err.Error())
 		return err
 	}

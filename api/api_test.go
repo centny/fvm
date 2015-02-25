@@ -83,29 +83,65 @@ func TestFVM(t *testing.T) {
 	os.RemoveAll("/tmp/fvm_a")
 	os.RemoveAll("/tmp/fvm/a6")
 	os.MkdirAll("/tmp/fvm_a", os.ModePerm)
-	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(map[string]interface{}{
-		"a1": ">=0.0.0",
-		"a2": "0.0.0",
-		"a3": ">=1.0.0",
-		"a4": "1.0.0",
-		"a5": ">=a.0.0",
-		"ax": "0.0.0",
-		"ab": map[string]string{},
-		"a6": "0.0.0",
-	}))
-	FVM_C(ts.URL, "/tmp/fvm_a")
-	FVM_C(ts.URL, "/tmp/fvm_a")
+	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(
+		map[string]interface{}{
+			"srv": ts.URL,
+			"fvm": map[string]interface{}{
+				"a1": ">=0.0.0",
+				"a2": "0.0.0",
+				"a3": ">=1.0.0",
+				"a4": "1.0.0",
+				"a5": ">=a.0.0",
+				"ax": "0.0.0",
+				"ab": map[string]string{},
+				"a6": "0.0.0",
+			},
+		}))
+	FVM_C("/tmp/fvm_a")
+	FVM_C("/tmp/fvm_a")
+	//
 	os.Remove("/tmp/fvm_a/fvm.json")
-	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(map[string]interface{}{
-		"a1": ">=0.0.0",
-		"a2": "0.0.0",
-	}))
+	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(
+		map[string]interface{}{
+			"srv": "ts.URL",
+			"fvm": map[string]interface{}{
+				"a1": ">=0.0.0",
+				"a2": "0.0.0",
+			},
+		}))
+	FVM_C("/tmp/fvm_a")
+	//
+	os.Remove("/tmp/fvm_a/fvm.json")
+	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(
+		map[string]interface{}{
+			"srv": ts.URL,
+			"fvm": map[string]interface{}{
+				"a1": ">=0.0.0",
+				"a2": "0.0.0",
+			},
+		}))
 	nm, _ := util.NewMap("/tmp/fvm_a/.fvm")
 	nm["skk"] = util.Map{}
 	util.FWrite("/tmp/fvm_a/.fvm", util.S2Json(nm))
-	FVM_C(ts.URL, "/tmp/fvm_a")
-	FVM_C(ts.URL+"/ss", "/tmp/fvm_a")
-	FVM_C(ts.URL, "/tmp/fvm_b")
+	FVM_C("/tmp/fvm_a")
+	FVM_C("/tmp/fvm_b")
+	//
+	os.Remove("/tmp/fvm_a/fvm.json")
+	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(
+		map[string]interface{}{
+			"fvm": map[string]interface{}{
+				"a1": ">=0.0.0",
+				"a2": "0.0.0",
+			},
+		}))
+	FVM_C("/tmp/fvm_a")
+	//
+	os.Remove("/tmp/fvm_a/fvm.json")
+	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(
+		map[string]interface{}{
+			"srv": ts.URL,
+		}))
+	FVM_C("/tmp/fvm_a")
 	//
 	err := FVM_U(ts.URL, "xxx", "0.0.0", "api.go")
 	if err != nil {
