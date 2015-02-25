@@ -35,7 +35,7 @@ func ULoad(hs *routing.HTTPSession) routing.HResult {
 		"SHA1": sha1,
 		"PATH": fpath,
 	})
-	if iv > 0 {
+	if iv > -1 {
 		mv.SetVal("VER", ver)
 		mv.SetVal("SHA1", sha1)
 	}
