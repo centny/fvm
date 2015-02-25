@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# fvmd        Startup script for log server.
+#
+# chkconfig: 2345 12 88
+### BEGIN INIT INFO
+# Provides: $syslog
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start or Stop the log server.
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+export LD_LIBRARY_PATH=/usr/local/lib
+RETVAL=0
+SRV_HOME=/var/lib/jenkins/jobs/AgsSrv/workspace
+SRV_D=$SRV_HOME
+srv_n=imsdd
+PIDFILE=/var/run/$srv_n.pid
+lockfile=/var/lock/$srv_n.lock
+export GOPATH=$SRV_HOME
+exec=$SRV_D/main
+start() {
+    [ -x $exec ] || exit 5
+    umask 077
+    echo -n "Starting $srv_n server: "
+    daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u jenkins -l $lockfile $exec conf/ims.properties
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+stop() {
+    echo -n "Shutting down $srv_n server: "
+    killproc -p "$PIDFILE" $exec
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+restart() {
+        stop
+        start
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        restart
+        ;;
+esac
+
+exit $?
