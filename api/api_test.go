@@ -67,7 +67,7 @@ func TestUpload(t *testing.T) {
 	os.Chmod("/tmp/fvm/fvm.json", os.ModePerm)
 }
 
-func TestFVM_C(t *testing.T) {
+func TestFVM(t *testing.T) {
 	ReloadFVM()
 	// os.RemoveAll("/tmp/fvm")
 	ts := httptest.NewMuxServer()
@@ -93,14 +93,8 @@ func TestFVM_C(t *testing.T) {
 		"ab": map[string]string{},
 		"a6": "0.0.0",
 	}))
-	err := FVM_C(ts.URL, "/tmp/fvm_a")
-	if err != nil {
-		t.Error(err.Error())
-	}
-	err = FVM_C(ts.URL, "/tmp/fvm_a")
-	if err != nil {
-		t.Error(err.Error())
-	}
+	FVM_C(ts.URL, "/tmp/fvm_a")
+	FVM_C(ts.URL, "/tmp/fvm_a")
 	os.Remove("/tmp/fvm_a/fvm.json")
 	util.FWrite("/tmp/fvm_a/fvm.json", util.S2Json(map[string]interface{}{
 		"a1": ">=0.0.0",
@@ -109,10 +103,19 @@ func TestFVM_C(t *testing.T) {
 	nm, _ := util.NewMap("/tmp/fvm_a/.fvm")
 	nm["skk"] = util.Map{}
 	util.FWrite("/tmp/fvm_a/.fvm", util.S2Json(nm))
-	err = FVM_C(ts.URL, "/tmp/fvm_a")
-	if err != nil {
-		t.Error(err.Error())
-	}
+	FVM_C(ts.URL, "/tmp/fvm_a")
 	FVM_C(ts.URL+"/ss", "/tmp/fvm_a")
 	FVM_C(ts.URL, "/tmp/fvm_b")
+	//
+	err := FVM_U(ts.URL, "xxx", "0.0.0", "api.go")
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+	fmt.Println(FVM_U(ts.URL, "xxx", "", "api.go"))
+	fmt.Println(FVM_U("", "xxx", "", "api.go"))
 }
+
+// func TestFVM2(t *testing.T) {
+// 	fmt.Println(FVM_U("http://192.168.2.30:9921", "xxx", "1.0.0", "api.go"))
+// }

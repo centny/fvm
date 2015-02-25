@@ -28,11 +28,13 @@ func FVM_C(srv, tp string) error {
 	n_fvm_l := util.Map{}
 	tfvm, err := util.NewMap(tp + "/fvm.json")
 	if err != nil {
-		return util.Err("read local fvm.json error:%v", err.Error())
+		log.E("read local fvm.json error:%v", err.Error())
+		return err
 	}
 	sfvm, err := util.HGet2(srv + "/fvm.json")
 	if err != nil {
-		return util.Err("load remote fvm.json error:%v", err.Error())
+		log.E("load remote fvm.json error:%v", err.Error())
+		return err
 	}
 	for tfn, tfv_ := range tfvm {
 		tfv, ok := tfv_.(string)
@@ -87,7 +89,7 @@ func FVM_C(srv, tp string) error {
 	}
 	o_fvm_l, err := util.NewMap(tp + "/.fvm")
 	defer util.FWrite(tp+"/.fvm", util.S2Json(n_fvm_l))
-	if err != nil {
+	if err != nil { //old fvm not found
 		return nil
 	}
 	for tfn, tfv_ := range o_fvm_l {
@@ -103,4 +105,18 @@ func FVM_C(srv, tp string) error {
 		os.Remove(tp + "/" + tfv)
 	}
 	return nil
+}
+
+func FVM_U(srv, name, ver, fp string) error {
+	mv, err := util.HPostF2(fmt.Sprintf("%v/api/uload?name=%v&ver=%v", srv, name, ver), nil, "file", fp)
+	if err != nil {
+		log.E("upload error:%v", err.Error())
+		return err
+	}
+	if mv.IntVal("code") == 0 {
+		return nil
+	} else {
+		log.E("upload error(%v),response:%v", mv.IntVal("code"), mv.StrVal("dmsg"))
+		return util.Err("response:%v", mv.StrVal("dmsg"))
+	}
 }

@@ -4,6 +4,7 @@ package srv
 
 import (
 	"fmt"
+	"github.com/Centny/fvm/api"
 	"github.com/Centny/fvm/conf"
 	"github.com/Centny/gwf/log"
 	"net/http"
@@ -27,7 +28,9 @@ func run(args []string) {
 	}
 	//
 	log.I("Config:\n%v", conf.Cfg.Show())
-	//test connect
+	//
+	//initial
+	api.ReloadFVM()
 	//
 	mux := http.NewServeMux()
 	HSrvMux(mux, "", conf.WDir())
