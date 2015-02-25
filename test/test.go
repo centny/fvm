@@ -18,5 +18,5 @@ func init() {
 	conf.Cfg = Cfg
 	os.RemoveAll("/tmp/fvm")
 	os.Mkdir("/tmp/fvm", os.ModePerm)
-	util.FWrite("/tmp/fvm/fvm.json", "{}")
+	// util.FWrite("/tmp/fvm/fvm.json", "{}")
 }

@@ -13,11 +13,12 @@ import (
 var FVM util.Map
 
 func ReloadFVM() {
-	var err error
-	FVM, err = util.NewMap(conf.WDir() + "/fvm.json")
-	if err != nil {
-		panic(err.Error())
+	fp := conf.WDir() + "/fvm.json"
+	if !util.Fexists(fp) {
+		util.FTouch(fp)
+		util.FWrite(fp, "{}")
 	}
+	FVM, _ = util.NewMap(fp)
 }
 
 func StoreFVM() error {
