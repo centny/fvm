@@ -65,13 +65,14 @@ func TestUpload(t *testing.T) {
 		ReloadFVM()
 	}()
 	os.Chmod("/tmp/fvm/fvm.json", os.ModePerm)
+	//
 }
 
 func TestFVM(t *testing.T) {
 	ReloadFVM()
 	// os.RemoveAll("/tmp/fvm")
 	ts := httptest.NewMuxServer()
-	ts.Mux.HFunc("^/api/uload(\\?.*)?$", ULoad)
+	Handle(ts.Mux)
 	ts.Mux.Handler("^.*$", http.FileServer(http.Dir(conf.WDir())))
 	fmt.Println(ts.PostF2("/api/uload?name=a1&ver=0.0.0", "file", "../fvm/fvm.go", nil))
 	fmt.Println(ts.PostF2("/api/uload?name=a1&ver=1.0.0", "file", "../fvm/fvm.go", nil))
@@ -80,6 +81,20 @@ func TestFVM(t *testing.T) {
 	fmt.Println(ts.PostF2("/api/uload?name=a4&ver=0.0.0", "file", "../api/api_test.go", nil))
 	fmt.Println(ts.PostF2("/api/uload?name=a5&ver=0.0.0", "file", "../api/store.go", nil))
 	fmt.Println(ts.PostF2("/api/uload?name=a6&ver=0.0.0", "file", "../conf/conf.go", nil))
+	//
+	//test raw download.
+	err := util.DLoad("/tmp/aaa.x", "%v/raw/a1", ts.URL)
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+	util.DLoad("/tmp/aaa.x", "%v/raw/asdd", ts.URL)
+	FVM.SetVal("kjy", util.Map{
+		"VER": "10.0",
+	})
+	util.DLoad("/tmp/aaa.x", "%v/raw/kjy", ts.URL)
+	//
+	//
 	os.RemoveAll("/tmp/fvm_a")
 	os.RemoveAll("/tmp/fvm/a6")
 	os.MkdirAll("/tmp/fvm_a", os.ModePerm)
@@ -143,7 +158,7 @@ func TestFVM(t *testing.T) {
 		}))
 	FVM_C("/tmp/fvm_a")
 	//
-	err := FVM_U(ts.URL, "xxx", "0.0.0", "api.go")
+	err = FVM_U(ts.URL, "xxx", "0.0.0", "api.go")
 	if err != nil {
 		t.Error(err.Error())
 		return

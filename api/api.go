@@ -5,6 +5,7 @@ import (
 	"github.com/Centny/gwf/log"
 	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
+	"path/filepath"
 )
 
 func ULoad(hs *routing.HTTPSession) routing.HResult {
@@ -48,4 +49,20 @@ func ULoad(hs *routing.HTTPSession) routing.HResult {
 		log.E("add new version by name(%v),ver(%v),sha1(%v) to path(%v)->ERR:%v", name, ver, sha1, fpath, err.Error())
 		return hs.MsgResErr2(1, "srv-err", err)
 	}
+}
+
+func Raw(hs *routing.HTTPSession) routing.HResult {
+	_, fn := filepath.Split(hs.R.URL.Path)
+	mv := FVM.MapVal(fn)
+	if mv == nil {
+		hs.W.WriteHeader(404)
+		return routing.HRES_RETURN
+	}
+	tfv := mv.MapVal(mv.StrVal("VER"))
+	if tfv == nil {
+		hs.W.WriteHeader(404)
+		return routing.HRES_RETURN
+	}
+	hs.Redirect("../" + tfv.StrVal("PATH"))
+	return routing.HRES_RETURN
 }

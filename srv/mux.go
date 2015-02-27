@@ -15,7 +15,7 @@ func HSrvMux(smux *http.ServeMux, pre string, www string) {
 	mux.HFilter("^/.*$", cors)
 	//
 	//
-	mux.HFunc("^/api/uload(\\?.*)?$", api.ULoad)
+	api.Handle(mux)
 	mux.Handler("^/.*$", http.FileServer(http.Dir(www)))
 	//
 	smux.Handle("/", mux)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Centny/fvm/conf"
 	"github.com/Centny/gwf/log"
+	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
 	"os"
 	"path/filepath"
@@ -132,4 +133,9 @@ func FVM_U(srv, name, ver, fp string) error {
 		log.E("upload error(%v),response:%v", mv.IntVal("code"), mv.StrVal("dmsg"))
 		return util.Err("response:%v", mv.StrVal("dmsg"))
 	}
+}
+
+func Handle(mux *routing.SessionMux) {
+	mux.HFunc("^/api/uload(\\?.*)?$", ULoad)
+	mux.HFunc("^/raw/.*$", Raw)
 }
