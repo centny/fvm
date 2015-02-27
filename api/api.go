@@ -6,6 +6,7 @@ import (
 	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
 	"path/filepath"
+	"strings"
 )
 
 func ULoad(hs *routing.HTTPSession) routing.HResult {
@@ -53,15 +54,14 @@ func ULoad(hs *routing.HTTPSession) routing.HResult {
 
 func Raw(hs *routing.HTTPSession) routing.HResult {
 	_, fn := filepath.Split(hs.R.URL.Path)
+	fn = strings.Trim(fn, " \t/")
 	mv := FVM.MapVal(fn)
 	if mv == nil {
-		hs.W.WriteHeader(404)
-		return routing.HRES_RETURN
+		return hs.MsgResE(404, fn+" not exist in reponsity")
 	}
 	tfv := mv.MapVal(mv.StrVal("VER"))
 	if tfv == nil {
-		hs.W.WriteHeader(404)
-		return routing.HRES_RETURN
+		return hs.MsgResE(404, "version "+mv.StrVal("VER")+" not exist in reponsity")
 	}
 	hs.Redirect("../" + tfv.StrVal("PATH"))
 	return routing.HRES_RETURN
