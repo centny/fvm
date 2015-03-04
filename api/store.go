@@ -7,6 +7,7 @@ import (
 	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 )
@@ -134,7 +135,35 @@ func FVM_U(srv, name, ver, fp string) error {
 		return util.Err("response:%v", mv.StrVal("dmsg"))
 	}
 }
-
+func FVM_A(tp string) error {
+	usr, _ := user.Current()
+	fp := usr.HomeDir + "/.fvm.json"
+	if !util.Fexists(fp) {
+		util.FTouch(fp)
+		util.FWrite(fp, "{}")
+	}
+	wlist, err := util.NewMap(fp)
+	if err != nil {
+		log.E("read .fvm.json error:%v", err.Error())
+		return err
+	}
+	wlist.SetVal(tp, 1)
+	return util.FWrite(fp, util.S2Json(wlist))
+}
+func FVM_ALL() error {
+	usr, _ := user.Current()
+	fp := usr.HomeDir + "/.fvm.json"
+	wlist, err := util.NewMap(fp)
+	if err != nil {
+		log.E("read .fvm.json error:%v", err.Error())
+		return err
+	}
+	for tp, _ := range wlist {
+		fmt.Println("<<<----", tp, "---->>>")
+		FVM_C(tp)
+	}
+	return nil
+}
 func Handle(mux *routing.SessionMux) {
 	mux.HFunc("^/api/uload(\\?.*)?$", ULoad)
 	mux.HFunc("^/raw/.*$", Raw)

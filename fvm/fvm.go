@@ -10,6 +10,8 @@ func usage() {
 	fmt.Println(`Usage:
 	fvm [-c [<target dir>]]					sync remote file to local.
 	fvm -u <server addr> <name> <version> <file path>	upload file to reponsity.
+	fvm -a [<target path>]					store path.
+	fmv -all								sync remote file for all stored path.
 			`)
 }
 func main() {
@@ -30,6 +32,16 @@ func main() {
 			os.Exit(1)
 		}
 		api.FVM_U(os.Args[2], os.Args[3], os.Args[4], os.Args[5])
+	case "-a":
+		var tp string
+		if len(os.Args) > 2 {
+			tp = os.Args[2]
+		} else {
+			tp, _ = os.Getwd()
+		}
+		api.FVM_A(tp)
+	case "-all":
+		api.FVM_ALL()
 	default:
 		usage()
 	}
