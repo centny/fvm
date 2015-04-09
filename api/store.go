@@ -166,5 +166,5 @@ func FVM_ALL() error {
 }
 func Handle(mux *routing.SessionMux) {
 	mux.HFunc("^/api/uload(\\?.*)?$", ULoad)
-	mux.HFunc("^/raw/.*$", Raw)
+	mux.HFunc("^/raw.*$", Raw)
 }

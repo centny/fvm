@@ -2,33 +2,24 @@
 #
 # fvmd        Startup script for log server.
 #
-# chkconfig: 2345 12 88
-### BEGIN INIT INFO
-# Provides: $syslog
-# Required-Start: $local_fs
-# Required-Stop: $local_fs
-# Default-Start:  2 3 4 5
-# Default-Stop: 0 1 6
-# Short-Description: Start or Stop the log server.
-### END INIT INFO
+# chkconfig: 345 90 4
 
 # Source function library.
 . /etc/init.d/functions
 
 export LD_LIBRARY_PATH=/usr/local/lib
 RETVAL=0
-SRV_HOME=/var/lib/jenkins/jobs/AgsSrv/workspace
+SRV_HOME=RV_SRVD_HOME
 SRV_D=$SRV_HOME
 srv_n=fvmd
 PIDFILE=/var/run/$srv_n.pid
 lockfile=/var/lock/$srv_n.lock
-export GOPATH=$SRV_HOME
-exec=$SRV_D/main
+exec=$SRV_D/fvm
 start() {
     [ -x $exec ] || exit 5
     umask 077
     echo -n "Starting $srv_n server: "
-    daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u fvm -l $lockfile $exec conf/fvm.properties
+    daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u fvmd -l $lockfile $exec conf/fvm.properties
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch $lockfile
