@@ -10,23 +10,26 @@
 export LD_LIBRARY_PATH=/usr/local/lib
 RETVAL=0
 SRV_HOME=RV_SRVD_HOME
-SRV_D=$SRV_HOME
-srv_n=fvmd
+exe_n=fvm
+srv_n="$exe_n"d
 usr_n=$srv_n
+if [ "$SRVD_USR" != "" ];then
+    usr_n=$SRVD_USR
+fi
+
+##
+SRV_D=$SRV_HOME
 PIDFILE=/var/run/$srv_n.pid
 lockfile=/var/lock/$srv_n.lock
 export GOPATH=$SRV_HOME
-exec=$SRV_D/fvm
-if [ ! "$SRVD_USR" = "" ];then
-    usr_n=$SRVD_USR
-fi
+exec=$SRV_D/$exe_n
 start() {
     [ -x $exec ] || exit 5
 
     umask 077
 
         echo -n "Starting $srv_n server: "
-        daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u $usr_n -l $lockfile $exec conf/sr.properties
+        daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u $usr_n -l $lockfile $exec conf/$exe_n.properties
         RETVAL=$?
     echo
         [ $RETVAL -eq 0 ] && touch $lockfile

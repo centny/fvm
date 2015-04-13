@@ -1,0 +1,11 @@
+1. build the binary
+
+  ./pkg.sh https://raw.githubusercontent.com/Centny/script-set/master/srvd_i
+  
+2. copy the `*.zip` in `build` folder to target server
+3. unzip package file.
+4. install or uninstall service
+  * `./install.sh -i` to install the service.
+  * `./install.sh -i user` to install in special user.
+  * `./install.sh -u` to uninstall.
+
