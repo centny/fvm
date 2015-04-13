@@ -10,11 +10,11 @@
 export LD_LIBRARY_PATH=/usr/local/lib
 RETVAL=0
 SRV_HOME=RV_SRVD_HOME
+usr_n=RV_SRVD_USR
 exe_n=fvm
 srv_n="$exe_n"d
-usr_n=$srv_n
-if [ "$SRVD_USR" != "" ];then
-    usr_n=$SRVD_USR
+if [ "$usr_n" == "" ];then
+    usr_n=$srv_n
 fi
 
 ##
