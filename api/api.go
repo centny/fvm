@@ -63,6 +63,6 @@ func Raw(hs *routing.HTTPSession) routing.HResult {
 	if tfv == nil {
 		return hs.MsgResE(404, "version "+mv.StrVal("VER")+" not exist in reponsity")
 	}
-	hs.Redirect("../" + tfv.StrVal("PATH"))
+	hs.SendF2(conf.WDir() + "/" + tfv.StrVal("PATH"))
 	return routing.HRES_RETURN
 }

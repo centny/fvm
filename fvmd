@@ -12,26 +12,33 @@ RETVAL=0
 SRV_HOME=RV_SRVD_HOME
 SRV_D=$SRV_HOME
 srv_n=fvmd
+usr_n=$srv_n
 PIDFILE=/var/run/$srv_n.pid
 lockfile=/var/lock/$srv_n.lock
+export GOPATH=$SRV_HOME
 exec=$SRV_D/fvm
+if [ ! "$SRVD_USR" = "" ];then
+    usr_n=$SRVD_USR
+fi
 start() {
     [ -x $exec ] || exit 5
+
     umask 077
-    echo -n "Starting $srv_n server: "
-    daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u fvmd -l $lockfile $exec conf/fvm.properties
-    RETVAL=$?
+
+        echo -n "Starting $srv_n server: "
+        daemonize -o /var/log/$srv_n/out.log -e /var/log/$srv_n/err.log -c $SRV_D -p $PIDFILE -u $usr_n -l $lockfile $exec conf/sr.properties
+        RETVAL=$?
     echo
-    [ $RETVAL -eq 0 ] && touch $lockfile
+        [ $RETVAL -eq 0 ] && touch $lockfile
     return $RETVAL
 }
 stop() {
-    echo -n "Shutting down $srv_n server: "
-    killproc -p "$PIDFILE" $exec
-    RETVAL=$?
-    echo
-    [ $RETVAL -eq 0 ] && rm -f $lockfile
-    return $RETVAL
+        echo -n "Shutting down $srv_n server: "
+        killproc -p "$PIDFILE" $exec
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f $lockfile
+        return $RETVAL
 }
 restart() {
         stop

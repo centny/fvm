@@ -13,6 +13,7 @@ mkdir $o_srv/www
 go build -o $o_srv/fvm github.com/Centny/fvm/main
 cp fvmd $o_srv
 cp conf/fvm.properties $o_srv/conf
+cp conf/local.properties $o_srv/conf
 echo {}>$o_srv/www/fvm.json
 if [ "$1" != "" ];then
 	curl -o $o_srv/srvd_i $1
