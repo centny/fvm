@@ -14,8 +14,8 @@ echo "Installing Dependence"
 #########Running Clear#########
 if [ "$1" = "-u" ];then
  echo "Running Clear"
- rm -rf $GOPATH/src/github.com/Centny/gwf
- go get -u github.com/Centny/gwf
+ rm -rf $GOPATH/src/github.com/Centny/fvm
+ go get github.com/Centny/fvm
 fi
 #########Running Test#########
 echo "Running Test"
