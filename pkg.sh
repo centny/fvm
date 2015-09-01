@@ -20,7 +20,7 @@ o_srv=$o_dir/$n_srv
 mkdir $o_srv
 mkdir $o_srv/conf
 mkdir $o_srv/www
-go build -o $o_srv/n_srv github.com/Centny/fvm/main
+go build -o $o_srv/$n_srv github.com/Centny/fvm/main
 cp fvmd $o_srv
 cp conf/fvm.properties $o_srv/conf
 cp conf/local.properties $o_srv/conf

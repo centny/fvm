@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Centny/fvm/conf"
 	_ "github.com/Centny/fvm/test"
+	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/routing/httptest"
 	"github.com/Centny/gwf/util"
 	"net/http"
@@ -13,7 +14,10 @@ import (
 
 func TestUpload(t *testing.T) {
 	ReloadFVM()
-	ts := httptest.NewServer(ULoad)
+	ts := httptest.NewServer(func(hs *routing.HTTPSession) routing.HResult {
+		hs.ParseQuery()
+		return ULoad(hs)
+	})
 	mv, err := ts.PostF2("?name=abc&ver=0.0.0", "file", "api.go", nil)
 	if err != nil {
 		t.Error(err.Error())
@@ -81,6 +85,10 @@ func TestFVM(t *testing.T) {
 	fmt.Println(ts.PostF2("/api/uload?name=a4&ver=0.0.0", "file", "../api/api_test.go", nil))
 	fmt.Println(ts.PostF2("/api/uload?name=a5&ver=0.0.0", "file", "../api/store.go", nil))
 	fmt.Println(ts.PostF2("/api/uload?name=a6&ver=0.0.0", "file", "../conf/conf.go", nil))
+	fmt.Println(ts.PostF2("/api/uload?name=a61&ver=0.0.0", "file", "../conf/conf.go", nil))
+	util.FWrite("t.txt", "abccc->>>")
+	util.Zip("t.zip", ".", "t.txt")
+	fmt.Println(ts.PostF2("/api/uload?name=a7&ver=0.0.0", "file", "t.zip", nil))
 	//
 	//test raw download.
 	err := util.DLoad("/tmp/aaa.x", "%v/raw/a1", ts.URL)
@@ -102,14 +110,16 @@ func TestFVM(t *testing.T) {
 		map[string]interface{}{
 			"srv": ts.URL,
 			"fvm": map[string]interface{}{
-				"a1": ">=0.0.0",
-				"a2": "0.0.0",
-				"a3": ">=1.0.0",
-				"a4": "1.0.0",
-				"a5": ">=a.0.0",
-				"ax": "0.0.0",
-				"ab": map[string]string{},
-				"a6": "0.0.0",
+				"a1":      ">=0.0.0",
+				"a2":      "0.0.0",
+				"a3":      ">=1.0.0",
+				"a4":      "1.0.0",
+				"a5":      ">=a.0.0",
+				"ax":      "0.0.0",
+				"ab":      map[string]string{},
+				"a6":      "0.0.0",
+				"a61@zip": "0.0.0",
+				"a7@zip":  "0.0.0",
 			},
 		}))
 	FVM_C("/tmp/fvm_a")

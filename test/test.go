@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var Cfg util.Fcfg = util.Fcfg{}
+var Cfg *util.Fcfg = util.NewFcfg3()
 
 func init() {
 	if !Cfg.Exist("LISTEN_ADDR") {

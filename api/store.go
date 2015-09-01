@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/Centny/fvm/conf"
 	"github.com/Centny/gwf/log"
-	"github.com/Centny/gwf/routing"
 	"github.com/Centny/gwf/util"
 	"os"
 	"os/user"
@@ -51,11 +50,17 @@ func FVM_C(tp string) error {
 		log.E("load remote fvm.json error:%v", err.Error())
 		return err
 	}
-	for tfn, tfv_ := range tfvm {
+	for tfn_, tfv_ := range tfvm {
 		tfv, ok := tfv_.(string)
 		if !ok {
-			log.W("invalid value for %v", tfn)
+			log.W("invalid value for %v", tfn_)
 			continue
+		}
+		unzip := false
+		tfn := tfn_
+		if strings.HasSuffix(tfn_, "@zip") {
+			unzip = true
+			tfn = strings.TrimSuffix(tfn_, "@zip")
 		}
 		tfn = strings.Trim(tfn, " \t\n")
 		tfv = strings.Trim(tfv, " \t\n")
@@ -96,10 +101,19 @@ func FVM_C(tp string) error {
 		}
 		dpath := fmt.Sprintf("%v/%v", srv, sfn_tv.StrVal("PATH"))
 		err = util.DLoad(spath, dpath)
-		if err == nil {
-			log.D("download file(%v) success", dpath)
-		} else {
+		if err != nil {
 			log.W("download file(%v) error:%v", dpath, err.Error())
+			continue
+		}
+		log.D("download file(%v) success", dpath)
+		if !unzip {
+			continue
+		}
+		err = util.Unzip(spath, filepath.Dir(spath))
+		if err == nil {
+			log.D("unzip file(%v) success", spath)
+		} else {
+			log.W("unzip file(%v) error:%v", spath, err.Error())
 		}
 	}
 	o_fvm_l, err := util.NewMap(tp + "/.fvm")
@@ -150,6 +164,25 @@ func FVM_A(tp string) error {
 	wlist.SetVal(tp, 1)
 	return util.FWrite(fp, util.S2Json(wlist))
 }
+func FVM_D(tp string) error {
+	usr, _ := user.Current()
+	fp := usr.HomeDir + "/.fvm.json"
+	if !util.Fexists(fp) {
+		return util.Err("file（%v） not found", fp)
+	}
+	wlist, err := util.NewMap(fp)
+	if err != nil {
+		log.E("read .fvm.json error:%v", err.Error())
+		return err
+	}
+	delete(wlist, tp)
+	os.Remove(fp)
+	// if err != nil {
+	// 	log.E("remove .fvm.json error:%v", err.Error())
+	// 	return err
+	// }
+	return util.FWrite(fp, util.S2Json(wlist))
+}
 func FVM_ALL() error {
 	usr, _ := user.Current()
 	fp := usr.HomeDir + "/.fvm.json"
@@ -163,8 +196,4 @@ func FVM_ALL() error {
 		FVM_C(tp)
 	}
 	return nil
-}
-func Handle(mux *routing.SessionMux) {
-	mux.HFunc("^/api/uload(\\?.*)?$", ULoad)
-	mux.HFunc("^/raw.*$", Raw)
 }
